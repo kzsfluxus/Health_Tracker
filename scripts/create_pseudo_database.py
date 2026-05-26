@@ -91,7 +91,7 @@ def _test_conn(path: Path):
 # Konfiguráció
 # ---------------------------------------------------------------------------
 
-DAYS        = 31
+DAYS        = 45  # dropna után ~41 sor marad, bőven a min_days_for_ml=30 felett
 START_DATE  = date.today() - timedelta(days=DAYS - 1)
 RANDOM_SEED = 42
 
