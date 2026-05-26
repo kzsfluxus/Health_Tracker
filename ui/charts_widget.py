@@ -61,9 +61,10 @@ class _MLTab(QWidget):
     """
 
     TARGET_LABELS = {
-        "pain_avg":   "Fájdalom",
-        "mood_avg":   "Hangulat",
-        "energy_avg": "Energia",
+        "sleep_hours": "Alvás (időjárás hatása)",
+        "pain_avg":    "Fájdalom",
+        "mood_avg":    "Hangulat",
+        "energy_avg":  "Energia",
     }
 
     def __init__(self):
@@ -163,7 +164,7 @@ class _MLTab(QWidget):
             df     = load_merged()
             matrix = build_feature_matrix(df)
             latest = matrix.iloc[[-1]]
-            pred   = predict_next(model, latest)
+            pred   = predict_next(model, latest, target)
             label  = self.TARGET_LABELS[target]
             self._status.setText(
                 f"Holnapi {label} becslés: {pred:.1f} / 10"

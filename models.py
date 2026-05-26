@@ -20,7 +20,8 @@ import pandas as pd
 
 from config import config
 
-FEATURE_COLS = [
+# Hangulat/fájdalom/energia modelleknél az alvás is feature
+FEATURE_COLS_DEFAULT = [
     "sleep_hours",
     "prev_sleep",
     "sleep_ma3",
@@ -32,7 +33,26 @@ FEATURE_COLS = [
     "precipitation",
 ]
 
-TARGETS = ("mood_avg", "pain_avg", "energy_avg")
+# Alvás modellnél csak az időjárás + előző napi alvás szerepel feature-ként —
+# a sleep_hours és sleep_ma3 nem lehet egyszerre feature és target
+FEATURE_COLS_SLEEP = [
+    "prev_sleep",
+    "temperature_avg",
+    "pressure_avg",
+    "pressure_ma3",
+    "pressure_delta",
+    "humidity_avg",
+    "precipitation",
+]
+
+FEATURE_COLS_BY_TARGET: dict[str, list[str]] = {
+    "sleep_hours": FEATURE_COLS_SLEEP,
+    "mood_avg":    FEATURE_COLS_DEFAULT,
+    "pain_avg":    FEATURE_COLS_DEFAULT,
+    "energy_avg":  FEATURE_COLS_DEFAULT,
+}
+
+TARGETS = ("sleep_hours", "mood_avg", "pain_avg", "energy_avg")
 
 
 # ---------------------------------------------------------------------------
@@ -62,9 +82,11 @@ def train_model(df: pd.DataFrame, target: str = "pain_avg") -> TrainResult:
 
     Paraméterek:
         df     -- analytics.build_feature_matrix() kimenete
-        target -- célváltozó ('pain_avg', 'mood_avg', 'energy_avg')
+        target -- célváltozó ('sleep_hours', 'pain_avg', 'mood_avg', 'energy_avg')
 
     A df már validált (min_days ellenőrzés az analytics rétegben történt).
+    Az alvás modellnél külön feature set érvényes (sleep_hours nem lehet
+    egyszerre feature és target).
     """
     try:
         import lightgbm as lgb
@@ -76,7 +98,8 @@ def train_model(df: pd.DataFrame, target: str = "pain_avg") -> TrainResult:
     if target not in TARGETS:
         raise ValueError(f"Ismeretlen target: {target!r}. Válassz egyet: {TARGETS}")
 
-    available = [c for c in FEATURE_COLS if c in df.columns]
+    feature_cols = FEATURE_COLS_BY_TARGET[target]
+    available = [c for c in feature_cols if c in df.columns]
     X = df[available].reset_index(drop=True)
     y = df[target].reset_index(drop=True)
 
@@ -179,14 +202,16 @@ def model_exists(target: str) -> bool:
 # Predikció
 # ---------------------------------------------------------------------------
 
-def predict_next(model, latest_features: pd.DataFrame) -> float:
+def predict_next(model, latest_features: pd.DataFrame, target: str) -> float:
     """
     Előrejelzés a következő napra a legfrissebb feature-sor alapján.
 
-    latest_features: egyetlen sor DataFrame, FEATURE_COLS oszlopokkal.
+    latest_features: egyetlen sor DataFrame a szükséges oszlopokkal.
+    target: a célváltozó neve — ebből derül ki melyik feature set érvényes.
     Visszaad: kerekített predikció (1.0–10.0 közé clampelve).
     """
-    available = [c for c in FEATURE_COLS if c in latest_features.columns]
+    feature_cols = FEATURE_COLS_BY_TARGET.get(target, FEATURE_COLS_DEFAULT)
+    available = [c for c in feature_cols if c in latest_features.columns]
     pred = model.predict(latest_features[available])[0]
     return float(round(np.clip(pred, 1.0, 10.0), 2))
 

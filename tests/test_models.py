@@ -95,7 +95,7 @@ class TestTrainModel:
 
     def test_all_targets_train(self):
         df = make_feature_matrix()
-        for target in ("pain_avg", "mood_avg", "energy_avg"):
+        for target in ("sleep_hours", "pain_avg", "mood_avg", "energy_avg"):
             result = train_model(df, target=target)
             assert result.target == target
 
