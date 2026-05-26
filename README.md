@@ -1,4 +1,4 @@
-# Alvás–Időjárás–Közérzet Követő
+# Alvás–Időjárás–Közérzet követő
 
 Offline-first személyes egészségnapló PyQt6 + SQLite alapon.
 Automatikusan letölti az időjárási adatokat (Open-Meteo API),
