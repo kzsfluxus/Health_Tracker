@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Adatbázisok — személyes adat, nem kerül repóba
+data/health_tracker.db
+data/health_tracker_test.db
+
+# Mentett modellek — újrataníthatók, nem verziókövetett artifact
+data/models/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

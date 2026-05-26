@@ -1,0 +1,23 @@
+[location]
+lat = 47.3949
+lon = 18.9136
+name = "Érd"
+
+[database]
+path = "data/health_tracker.db"
+
+[models]
+# LightGBM modellek mentési könyvtára
+storage_dir = "data/models"
+
+[weather]
+# Automatikus frissítés indításkor, ha a mai adat hiányzik
+auto_fetch_on_start = true
+# Hány napra visszamenőleg kérjen le adatot, ha az DB üres
+initial_fetch_days = 30
+
+[thresholds]
+# Ennyi óránál kevesebb alvás számít "rossz" napnak
+bad_sleep_hours = 6.0
+# Ennyi nap adat kell az ML pipeline elindításához (v0.3)
+min_days_for_ml = 30

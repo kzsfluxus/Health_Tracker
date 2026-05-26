@@ -1,0 +1,9 @@
+PyQt6
+pandas
+matplotlib
+requests
+lightgbm
+shap
+scikit-learn
+pytest
+pytest-mock
